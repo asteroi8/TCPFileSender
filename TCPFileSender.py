@@ -1,5 +1,4 @@
 import socket
-import _thread
 import sys
 
 
@@ -14,18 +13,14 @@ def readFile():
 
 #handler for sending data to clients
 def sendData(clientsock,addr):
-    totalsent = 0
     data = readFile()
-    while totalsent < len(data):
-        sent = clientsock.send(bytes(data, 'UTF-8'))
-        if sent == 0:
-            raise RUNtimeError("socket connection broken")
-        totalsent = totalsent + sent
-    clientsock.shutdown(1)
-
+    clientsock.send(bytes(data, 'UTF-8'))
+    
 if __name__=='__main__':
     #create tcp socket
     socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+     #forcibly bind to port in use
+    _socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     #setup socket
     server_address = ("", 4002)
@@ -34,27 +29,21 @@ if __name__=='__main__':
     #listen for connections n=5
     socket.listen(5)
 
-    while True:
+   while True:
         #when client connections made, read from file and send to client socket
-        connection, client = socket.accept()
-
+        connection, client = _socket.accept()
+        
         try:
             print(sys.stderr, "waiting for connection")
-        #unfortunately keeps reading and sending the
+            #unfortunately keeps reading and sending the
                 #data but only to one client connection
-            #read and send data to
-            while connection:                
-                if readFile():
-                    #send data over socket
-                    sendData(connection, client)
-                    #threaded
-                   #_thread.start_new_thread(sendData, (connection, client))
-                else:
-                    print(sys.stderr, "sorry bru no more data")
-                    break
+            #read and send data to               
+            if readFile():
+                #send data over socket
+                sendData(connection, client)
+            else:
+                print(sys.stderr, "sorry bru no more data")
+                break
         finally:
             #clean up the connection
             connection.close()
-            
-                                        
-#create thread for sending data on each connection
