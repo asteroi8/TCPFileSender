@@ -39,7 +39,7 @@ def setupServer(address, port):
 def runServer(sock):
     # create that file here
     createFile()
-    ## listen for connections n=5
+    # listen for connections n=5
     sock.listen(5)
 
     while True:
